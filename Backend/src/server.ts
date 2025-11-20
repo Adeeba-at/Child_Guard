@@ -1,41 +1,50 @@
-// src/server.ts 
-
+// src/server.ts
 import express from 'express';
 import cors from 'cors';
-import path from 'path'; // Needed to resolve directory paths
-import authRoutes from './routes/authRoutes'; 
-import indexRouter from './routes/index'; 
-import caseReporterRoutes from "./routes/caseReporterRoutes";
+import path from 'path';
+import fs from 'fs';
+
+import indexRouter from './routes/index';
+import authRoutes from './routes/authRoutes';
+import familyRoutes from './routes/familyroutes';        // ← FIXED
+import caseReporterRoutes from './routes/caseReporterRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// --- Core Middleware ---
+// Middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // Good for standard form data
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// --- Static File Serving (Crucial for Photos) ---
-// The line below makes the files in the 'public/uploads' directory accessible 
-// via the web path '/uploads'. This is how the saved photo URL works.
-app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads'))); 
+// Uploads folder
+const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+app.use('/uploads', express.static(uploadsDir));
 
-// --- Route Definitions ---
-
-// 1. HOME PAGE ROUTE
-// The root path '/' now returns the API status JSON from your index router
-app.use('/', indexRouter); 
-
-// 2. API ROUTES (Prefixing them helps organize)
+// === ALL ROUTES — BEFORE listen() ===
+app.use('/', indexRouter);
 app.use('/api/auth', authRoutes);
+app.use('/api/auth/families', familyRoutes);     // ← NOW WORKS
+app.use('/case', caseReporterRoutes);
 
-// The case reporter route is registered at '/case'. 
-// Your POST endpoint for file upload should be defined within caseReporterRoutes
-app.use("/case", caseReporterRoutes); 
+// 404
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found',
+    working: [
+      'POST /api/auth/register',
+      'POST /api/auth/login',
+      'POST /api/auth/families/enroll (with Bearer token)',
+      'GET  /api/auth/families/my (with Bearer token)'
+    ]
+  });
+});
 
-// --- Server Start ---
+// Start server — LAST LINE
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    // A quick check to confirm the static path being served
-    console.log(`Serving static uploads from: ${path.join(__dirname, '..', 'public', 'uploads')}`);
+  console.log(`ChildGuard Backend LIVE → http://localhost:${PORT}`);
 });
