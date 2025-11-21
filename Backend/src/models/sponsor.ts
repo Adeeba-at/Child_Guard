@@ -6,7 +6,7 @@ import { BaseModel } from "./BaseModels";
 export interface SponsorExtension {
   sponsor_id: string;
   phone: string | null;
-  preferences: string | null; // Stored as TEXT (JSON string) in DB
+  preferences: string | null; // Stored as TEXT (JSON string) in D
 }
 
 // Define the merged object type returned by create/find
