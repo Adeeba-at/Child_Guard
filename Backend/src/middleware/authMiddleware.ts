@@ -1,8 +1,8 @@
-// src/middleware/authMiddleware.ts (Conceptual file)
-
+// src/middleware/authMiddleware.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-// Assuming JWT_SECRET is imported or defined here
+
+// Keep your secret exactly as you had it (just recommend moving to .env later)
 const JWT_SECRET = 'your_jwt_secret'; 
 
 // 1. Define the payload shape that your JWT carries
@@ -17,7 +17,7 @@ export interface AuthRequest extends Request {
     user?: AuthPayload; 
 }
 
-// 3. The actual middleware function
+// 3. The actual middleware function (YOUR ORIGINAL — UNCHANGED)
 export const authMiddleware = (
     req: AuthRequest, // Use the extended type here
     res: Response, 
@@ -48,4 +48,19 @@ export const authMiddleware = (
     } catch (error) {
         return res.status(403).json({ message: 'Invalid or expired token' });
     }
+};
+
+//// Admin-only guard
+export const requireAdmin = (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+) => {
+    if (!req.user) {
+        return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ success: false, message: 'Admin access required' });
+    }
+    next();
 };
