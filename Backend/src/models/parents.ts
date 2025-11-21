@@ -1,5 +1,5 @@
 // src/models/parents.ts
-import { UserModel, User } from "./user"; // Import User for better type merging
+import { UserModel, User } from "./User"; // Import User for better type merging
 import { BaseModel } from "./BaseModels";
 
 // Define the Parent extension fields

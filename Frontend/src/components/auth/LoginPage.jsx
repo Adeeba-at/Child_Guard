@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './LoginPage.css';  // Use the same CSS as RegisterPage for consistency
+import './LoginPage.css'; // Use the same CSS as RegisterPage for consistency
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -8,6 +9,7 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,7 +25,13 @@ function LoginPage() {
         password,
       });
 
-      const token = response.data.token;
+      // --- START: CORRECTION HERE ---
+      // The role and user_id are inside the 'user' object in the response.
+      const { token, user } = response.data; 
+      const role = user.role;
+      const userId = user.user_id; // This is the ID used in the volunteer path
+      // --- END: CORRECTION HERE ---
+
       localStorage.setItem('authToken', token);
 
       console.log('Login Successful, Token:', token);
@@ -31,9 +39,18 @@ function LoginPage() {
       setEmail('');
       setPassword('');
 
-      // TODO: redirect using react-router
-      // navigate('/dashboard');
-
+      // Redirect based on role
+      if (role === 'volunteer') {
+        if (!userId) {
+          setError('User ID (volunteer ID) missing from backend response.');
+          setLoading(false);
+          return;
+        }
+        // Use the extracted userId for the dashboard path
+        navigate(`/volunteer/${userId}/dashboard`); 
+      } else {
+        navigate('/'); // All other roles go to home page
+      }
     } catch (err) {
       console.error('Login Error:', err);
 

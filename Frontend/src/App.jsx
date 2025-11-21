@@ -1,18 +1,23 @@
 import { Routes, Route } from 'react-router-dom';
 import HomePage from "./pages/HomePage.jsx";
-// import LoginPage from './components/LoginPage'; // No longer needed here
-// import Dashboard from './components/Dashboard'; 
-import './App.css'; 
+import VolunteerDashboard from "./pages/volunteer_dashboard.jsx"; 
+import './App.css';
 
 function App() {
   return (
     <div className="App">
       <Routes>
-        {/* The root path now points to the HomePage, which contains the tabs */}
-        <Route path="/" element={<HomePage />} /> 
-        
-        {/* Placeholder for the secure Dashboard page */}
+        {/* Default Home Page */}
+        <Route path="/" element={<HomePage />} />
+
+        {/* Admin/General Dashboard */}
         <Route path="/dashboard" element={<h1>Welcome to the Dashboard!</h1>} />
+
+        {/* Volunteer Dashboard */}
+        <Route
+          path="/volunteer/:volunteerId/dashboard"
+          element={<VolunteerDashboard />}
+        />
       </Routes>
     </div>
   );

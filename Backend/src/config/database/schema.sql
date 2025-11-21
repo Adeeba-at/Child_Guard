@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS volunteers (
     phone TEXT,
     availability TEXT, -- JSON: {"days": ["Mon"], "time": "evening"}
     area TEXT,
-    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    status TEXT DEFAULT 'pending' CHECK (status IN ('pending','requested' 'approved', 'rejected')),
     FOREIGN KEY (volunteer_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
