@@ -1,49 +1,76 @@
-// src/server.ts 
-
 import express from 'express';
 import cors from 'cors';
 import path from 'path'; 
+import fs from 'fs'; // Needed for uploads directory creation
 
 // ── Existing routes ─────────────────────
+import indexRouter from './routes/index';
 import authRoutes from './routes/authRoutes'; 
-import indexRouter from './routes/index'; 
+import familyRoutes from './routes/familyroutes'; // From 'main'
 import caseReporterRoutes from "./routes/caseReporterRoutes";
-import visitsRoutes from "./routes/visitsRoutes";
-import volunteerRoutes from "./routes/volunteerRoutes";
-import userRoutes from "./routes/UserRoutes";
+import visitsRoutes from "./routes/visitsRoutes"; // From 'HEAD'
+import volunteerRoutes from "./routes/volunteerRoutes"; // From 'HEAD'
+import userRoutes from "./routes/UserRoutes"; // From 'HEAD'
 
 // ── NEW: Awareness module routes ────────
-import adminRoutes from './routes/adminRoutes';         // Admin-only (protected + role checked)
-import awarenessRoutes from './routes/awarenessRoutes'; // Public content (articles, videos, guides)
+import adminRoutes from './routes/adminRoutes'; // From 'HEAD' (Admin-only)
+import awarenessRoutes from './routes/awarenessRoutes'; // From 'HEAD' (Public content)
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ── Middleware ───────────────────────────
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true })); 
-app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads'))); 
+// Adopted 'main' limits for larger payloads (e.g., image uploads)
+app.use(express.json({ limit: '10mb' })); 
+app.use(express.urlencoded({ extended: true, limit: '10mb' })); 
+
+// Uploads folder setup (Adopted 'main' logic for directory creation)
+const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+app.use('/uploads', express.static(uploadsDir)); 
 
 // ── Route mounting ───────────────────────
 app.use('/', indexRouter); 
 app.use('/api/auth', authRoutes);
+app.use('/api/auth/families', familyRoutes);     // Mounted family routes from 'main'
 app.use("/case", caseReporterRoutes); 
+
+// Routes from 'HEAD'
 app.use("/visits", visitsRoutes);
 app.use("/volunteer", volunteerRoutes);
 app.use("/user", userRoutes);
 app.use("/availability", userRoutes);
 
-// ── NEW: Mount awareness routes ──────────
-app.use('/api/admin', adminRoutes);         // → POST/GET/PATCH/DELETE awareness-contents (admin only)
-app.use('/api/awareness', awarenessRoutes); // → GET published content (public / mobile app)
+// NEW: Mounted awareness routes from 'HEAD'
+app.use('/api/admin', adminRoutes);         // Admin content management
+app.use('/api/awareness', awarenessRoutes); // Public content display
+
+// 404 Handler (Adopted 'main's custom 404 handler, must be last route)
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Route not found',
+    working: [
+      'POST /api/auth/register',
+      'POST /api/auth/login',
+      'POST /api/auth/families/enroll (with Bearer token)',
+      'GET  /api/auth/families/my (with Bearer token)',
+      'GET  /api/awareness (New public content route)',
+      'POST /api/admin/awareness-contents (New admin route)'
+    ]
+  });
+});
 
 // ── Start server ────────────────────── ───
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Serving static uploads from: ${path.join(__dirname, '..', 'public', 'uploads')}`);
-  
-  // Helpful logs for the new module
-  console.log(`Public awareness content → http://localhost:${PORT}/api/awareness`);
-  console.log(`Admin awareness panel     → http://localhost:${PORT}/api/admin/awareness-contents`);
+  console.log(`ChildGuard Backend LIVE → http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Serving static uploads from: ${uploadsDir}`);
+  
+  // Helpful logs for the new awareness module
+  console.log(`Public awareness content  → http://localhost:${PORT}/api/awareness`);
+  console.log(`Admin awareness panel     → http://localhost:${PORT}/api/admin/awareness-contents`);
 });
