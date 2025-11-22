@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import HomePage from "./pages/HomePage.jsx";
 import VolunteerDashboard from "./pages/volunteer_dashboard.jsx"; 
+import AdminAwarenessDashboard from "./pages/AdminAwarenessDashboard.jsx";  
 import './App.css';
 
 function App() {
@@ -17,6 +18,12 @@ function App() {
         <Route
           path="/volunteer/:volunteerId/dashboard"
           element={<VolunteerDashboard />}
+        />
+
+        {/* Admin Awareness Content Management Dashboard */}
+        <Route
+          path="/admin/awareness"
+          element={<AdminAwarenessDashboard />}
         />
       </Routes>
     </div>
