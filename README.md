@@ -1,2 +1,4 @@
-# Child_Guard
-This is a project to help remove child labor from the society by helping the children through sponsorship.
+🌿#Child_Guard
+
+A small step towards a brighter future for children.
+This project helps report child labor cases and connects children with kind sponsors who can support their education, health, and growth.
