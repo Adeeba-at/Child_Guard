@@ -11,6 +11,8 @@ import volunteerRoutes from "./routes/volunteerRoutes";
 import userRoutes from "./routes/UserRoutes";
 const app = express();
 const PORT = process.env.PORT || 5000;
+import sponsorRoutes from "./routes/sponsorRoutes";
+app.use("/sponsors", sponsorRoutes);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
