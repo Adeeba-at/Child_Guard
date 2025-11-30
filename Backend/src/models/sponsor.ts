@@ -1,58 +1,52 @@
 // src/models/sponsor.ts
-import { UserModel, User } from "./User"; // Import User
-import { BaseModel } from "./BaseModels";
+import bcrypt from "bcryptjs";
+import { DatabaseConnection } from "../config/database/DatabaseConnection";
 
-// Define the Sponsor extension fields
-export interface SponsorExtension {
+const db = DatabaseConnection.getInstance();
+
+export interface Sponsor {
   sponsor_id: string;
-  phone: string | null;
-  preferences: string | null; // Stored as TEXT (JSON string) in DB
+  name: string;
+  email: string;
+  password: string;
+  phone?: string;
+  occupation?: string;
+  preferences?: string;
+  organization?: string;
+  type?: string;
+  status: string;
 }
 
-// Define the merged object type returned by create/find
-export type Sponsor = User & SponsorExtension;
-
-export class SponsorModel extends BaseModel {
-  static create(data: {
-    username: string;
-    email: string;
-    password: string;
-    phone?: string;
-    preferences?: any; // array or object
-  }): Sponsor { // Explicit return type
-    this.init();
-
-    const user = UserModel.create({
-      username: data.username,
-      email: data.email,
-      password: data.password,
-      role: "sponsor",
-    });
-
-    // Stringify preferences to store as TEXT/JSON string in SQLite
-    const prefsJson = data.preferences ? JSON.stringify(data.preferences) : null;
-
-    const insertSponsor = this.db.prepare(`
-      INSERT INTO sponsors (sponsor_id, phone, preferences)
-      VALUES (?, ?, ?)
-    `);
-    insertSponsor.run(user.user_id, data.phone ?? null, prefsJson);
-
-    // Select the extension fields
-    const extra = this.db.prepare("SELECT sponsor_id, phone, preferences FROM sponsors WHERE sponsor_id = ?").get(user.user_id) as SponsorExtension;
-    // Merge and return
-    return { ...user, ...extra };
+export class SponsorModel {
+  static async findById(id: string): Promise<Sponsor | null> {
+    const row = db.prepare("SELECT * FROM sponsors WHERE sponsor_id = ?").get(id);
+    return (row as Sponsor) || null;
   }
 
-  static find(user_id: string): Sponsor | null { // Explicit return type
-    this.init();
+  static async findByUserId(user_id: string): Promise<Sponsor | undefined> {
+    return db.prepare("SELECT * FROM sponsors WHERE sponsor_id = ?").get(user_id) as Sponsor | undefined;
+  }
 
-    const user = UserModel.findById(user_id);
-    if (!user || user.role !== "sponsor") return null;
+  static async update(
+    id: string,
+    updates: Partial<Omit<Sponsor, "sponsor_id" | "email" | "password">>
+  ): Promise<Sponsor> {
+    const fields = Object.keys(updates).map((key) => `${key} = @${key}`).join(", ");
+    db.prepare(`UPDATE sponsors SET ${fields} WHERE sponsor_id = @id`).run({ ...updates, id });
+    return (await this.findById(id)) as Sponsor;
+  }
 
-    // Select the extension fields
-    const extra = this.db.prepare("SELECT sponsor_id, phone, preferences FROM sponsors WHERE sponsor_id = ?").get(user_id) as SponsorExtension;
-    // Merge and return
-    return { ...user, ...extra };
+  static async getSponsoredChildren(sponsor_id: string) {
+    return db.prepare(`
+      SELECT cp.child_id, cp.name, cp.age, cp.gender, cp.grade,
+             cp.school AS school_name, cp.photo_url AS photo, cp.story, cp.city
+      FROM child_profiles cp
+      JOIN sponsor_children sc ON sc.child_id = cp.child_id
+      WHERE sc.sponsor_id = ?
+    `).all(sponsor_id);
+  }
+
+  static async getAllSponsors(): Promise<Sponsor[]> {
+    return db.prepare("SELECT * FROM sponsors").all() as Sponsor[];
   }
 }

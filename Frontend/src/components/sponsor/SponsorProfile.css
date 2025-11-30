@@ -1,0 +1,41 @@
+.sponsor-profile-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 20px;  /* space between fields */
+}
+
+.form-group label {
+  display: block;
+  font-size: 25px;      /* 2x bigger than before */
+  font-weight: 400;
+  margin-bottom: 8px;   /* small space before input */
+}
+
+.sponsor-profile-form input {
+  width: 75%;
+  padding: 12px;
+  font-size: 20px;      /* 2x bigger input text */
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  font-family: 'Poppins';
+}
+
+.sponsor-profile-form button {
+  margin-top: 20px;
+  font-size: 30px;      /* bigger button text */
+  padding: 15px 20px;
+  background: #03413b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.sponsor-profile-form button:hover {
+  background: #045c57;
+}

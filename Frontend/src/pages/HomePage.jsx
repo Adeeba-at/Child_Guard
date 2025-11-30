@@ -10,6 +10,7 @@ import HeroImage from '../assets/child-future-contrast.jpg';
 function HomePage() {
   const [activeTab, setActiveTab] = useState('login');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('sponsor'); // ← NEW: Track role
   const [awarenessContent, setAwarenessContent] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -20,7 +21,6 @@ function HomePage() {
     { title: "Transparent Tracking", icon: "Checkmark", description: "Offer sponsors and parents real-time updates on child progress." },
   ];
 
-  // Fetch published awareness content (public endpoint)
   useEffect(() => {
     const fetchAwareness = async () => {
       try {
@@ -35,20 +35,20 @@ function HomePage() {
     fetchAwareness();
   }, []);
 
-  const openPanel = (tab) => {
+  // UPDATED: Now accepts role
+  const openPanel = (tab, role = 'sponsor') => {
     setActiveTab(tab);
+    setSelectedRole(role);
     setIsPanelOpen(true);
   };
 
   const closeModal = () => setIsPanelOpen(false);
 
-  // Helper: Convert YouTube watch URL to embed
   const getEmbedUrl = (url) => {
     if (!url) return "";
     return url.replace("watch?v=", "embed/").replace("&", "?");
   };
 
-  // NEW: Open full article in beautiful popup
   const openFullArticle = (item) => {
     const win = window.open('', '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes');
     win.document.write(`
@@ -83,13 +83,20 @@ function HomePage() {
 
   return (
     <div className="home-page-container">
-      {/* Your existing nav and modal code */}
-      <nav className="auth-top-right" onClick={(e) => e.preventDefault()}>
+
+      {/* TOP RIGHT NAVIGATION */}
+      <nav className="auth-top-right">
         <button className="top-tab" onClick={() => openPanel('login')}>Login</button>
-        <button className="top-tab register-btn" onClick={() => openPanel('register')}>Register</button>
+        <button 
+          className="top-tab register-btn" 
+          onClick={() => openPanel('register', 'sponsor')} // ← Default to sponsor
+        >
+          Register
+        </button>
         <button className="top-tab about-btn" onClick={() => openPanel('about')}>About Us</button>
       </nav>
 
+      {/* MAIN MODAL */}
       {isPanelOpen && (
         <div className="auth-modal-overlay" onClick={closeModal}>
           <div className="auth-modal" onClick={e => e.stopPropagation()}>
@@ -97,12 +104,15 @@ function HomePage() {
             <div className="form-body">
               <div className="modal-content-area">
                 {activeTab === 'login' && <LoginPage />}
-                {activeTab === 'register' && <RegisterPage />}
+                
+                {/* PASS THE ROLE TO RegisterPage */}
+                {activeTab === 'register' && <RegisterPage selectedRole={selectedRole} />}
+                
                 {activeTab === 'about' && (
                   <div className="about-us-content">
                     <h2>ChildGuard: Our Mission</h2>
                     <p>ChildGuard is a web-based platform dedicated to protecting children from labor exploitation...</p>
-                    <button className="cta-btn" onClick={() => openPanel('register')}>Join the Cause</button>
+                    <button className="cta-btn" onClick={() => openPanel('register', 'sponsor')}>Join the Cause</button>
                   </div>
                 )}
                 {activeTab === 'report' && <ReportCase userId={null} />}
@@ -112,7 +122,7 @@ function HomePage() {
         </div>
       )}
 
-      {/* Hero Section */}
+      {/* HERO SECTION */}
       <section className="hero-section">
         <div className="hero-content">
           <h1 className="hero-title">Protecting Children, Building Futures</h1>
@@ -120,7 +130,6 @@ function HomePage() {
             A centralized platform to end child labor through <b>Educational Sponsorship</b> and <b>Anonymous Reporting</b>.
           </p>
           <div className="hero-buttons">
-            <button className="cta-btn" onClick={() => openPanel('register')}>Sponsor a Child Today</button>
             <button className="cta-btn-outline" onClick={() => openPanel('report')}>Report a Case</button>
           </div>
         </div>
@@ -129,7 +138,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Core Objectives */}
+      {/* CORE OBJECTIVES */}
       <section className="impact-section">
         <h2>Our Core Objectives</h2>
         <div className="objectives-container">
@@ -143,7 +152,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* NEW: Awareness & Updates Section (Public) */}
+      {/* AWARENESS SECTION */}
       <section className="awareness-section">
         <h2>Public Awareness Content</h2>
         {loading ? (
@@ -165,7 +174,6 @@ function HomePage() {
                 }}
                 title={item.type === 'video' ? "Click to watch on YouTube" : "Click to read full article"}
               >
-                {/* Show YouTube Video */}
                 {item.type === 'video' && item.content.includes('youtube.com') && (
                   <div className="awareness-video-wrapper">
                     <iframe
@@ -176,27 +184,19 @@ function HomePage() {
                     ></iframe>
                   </div>
                 )}
-
-                {/* Show Article/Guide Content */}
                 <div className="awareness-text">
                   <h3>{item.title}</h3>
-                  <p 
-                    dangerouslySetInnerHTML={{ 
-                      __html: item.content.length > 280 
-                        ? item.content.substring(0, 280) + "..." 
-                        : item.content 
-                    }} 
-                  />
+                  <p dangerouslySetInnerHTML={{ 
+                    __html: item.content.length > 280 
+                      ? item.content.substring(0, 280) + "..." 
+                      : item.content 
+                  }} />
                   <div className="awareness-footer">
-                    <small>
-                      Published on: {item.published_at ? new Date(item.published_at).toLocaleDateString() : "Recently"}
-                    </small>
+                    <small>Published on: {item.published_at ? new Date(item.published_at).toLocaleDateString() : "Recently"}</small>
                     {(item.type === 'article' || item.type === 'guide') && item.content.length > 280 && (
-                      <span className="read-more">Read full article →</span>
+                      <span className="read-more">Read full article</span>
                     )}
-                    {item.type === 'video' && (
-                      <span className="read-more">Watch Video →</span>
-                    )}
+                    {item.type === 'video' && <span className="read-more">Watch Video</span>}
                   </div>
                 </div>
               </div>
@@ -206,7 +206,7 @@ function HomePage() {
       </section>
 
       <footer className="footer">
-        &copy; 2025 ChildGuard. All Rights Reserved.
+        © 2025 ChildGuard. All Rights Reserved.
       </footer>
     </div>
   );

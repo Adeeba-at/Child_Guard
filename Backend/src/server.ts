@@ -1,4 +1,7 @@
 // src/server.ts
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -18,6 +21,8 @@ import userRoutes from './routes/UserRoutes';
 // ── NEW: Awareness module ───────────────────
 import adminRoutes from './routes/adminRoutes';             // Admin panel (protected)
 import awarenessRoutes from './routes/awarenessRoutes';     // Public content
+
+import sponsorRoutes from "./routes/sponsorRoutes";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -49,6 +54,9 @@ app.use('/availability', userRoutes);              // you had this twice → kep
 // ── Awareness Module Routes ─────────────────
 app.use('/api/admin', adminRoutes);                // Admin-only routes
 app.use('/api/awareness', awarenessRoutes);        // Public articles, videos, etc.
+
+//Sponsor
+app.use("/api/sponsor", sponsorRoutes);
 
 // ── 404 Handler ─────────────────────────────
 app.use((req, res) => {

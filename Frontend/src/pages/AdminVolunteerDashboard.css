@@ -1,75 +1,64 @@
-/* src/pages/AdminVolunteerDashboard.css */
-.admin-volunteer-dashboard {
-  padding: 20px;
-  max-width: 1400px;
-  margin: 0 auto;
-  font-family: Arial, sans-serif;
+/* Profile section (left column) */
+.profile-section {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: #000; /* text in profile box is black */
 }
 
-.admin-volunteer-dashboard h1 {
-  color: #008080;
-  margin-bottom: 20px;
+.profile-section h2 {
+  font-size: 24px; /* slightly bigger */
+  font-weight: 600;
+  margin-bottom: 15px;
 }
 
-.search-bar input {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  border: 2px solid #008080;
-  border-radius: 8px;
-  margin-bottom: 20px;
+/* Children section (right column) */
+.children-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: #000; /* text in children section black */
 }
 
-.volunteer-table-container {
-  overflow-x: auto;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.children-section h2 {
+  font-size: 24px; /* slightly bigger */
+  font-weight: 600;
+  margin-bottom: 15px;
 }
 
-.volunteer-table {
-  width: 100%;
-  border-collapse: collapse;
+/* Children cards container */
+.children-list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.child-card {
   background: white;
-}
-
-.volunteer-table th {
-  background-color: #008080;
-  color: white;
-  padding: 14px;
-  text-align: left;
-}
-
-.volunteer-table td {
-  padding: 14px;
-  border-bottom: 1px solid #eee;
-}
-
-.volunteer-table tr:hover {
-  background-color: #f5f5f5;
-}
-
-.btn-approve, .btn-reject {
-  padding: 8px 16px;
-  margin: 0 4px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.btn-approve {
-  background-color: #28a745;
-  color: white;
-}
-
-.btn-reject {
-  background-color: #dc3545;
-  color: white;
-}
-
-.loading {
+  padding: 20px; /* slightly bigger padding */
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   text-align: center;
-  padding: 60px;
-  font-size: 18px;
-  color: #008080;
+  color: #000; /* make text black */
+}
+
+.child-card h3 {
+  font-size: 20px; /* bigger text */
+  margin-top: 12px;
+}
+
+.child-card p {
+  font-size: 16px; /* bigger description */
+  opacity: 0.8;
+}
+
+/* Profile card inputs/buttons (if used inside profile section) */
+.sponsor-profile-card input,
+.sponsor-profile-card select {
+  font-size: 16px;
+}
+
+.sponsor-profile-card button {
+  font-size: 16px;
 }

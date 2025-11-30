@@ -1,18 +1,89 @@
-.link-btn {
-    background: none;
-    border: none;
-    color: #008080;
-    cursor: pointer;
-    text-decoration: underline;
-    font-size: 0.95em;
-    padding: 0;
+/* Container */
+.login-container,
+.register-container {
+  max-width: 400px;
+  margin: 80px auto;
+  background: #f9f9f9;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  text-align: center;
+  font-family: "Arial", sans-serif;
 }
 
-.link-btn:hover {
-    color: #006666;
+/* Headings */
+.login-container h2,
+.register-container h1 {
+  color: #008080;
+  margin-bottom: 25px;
 }
 
-.forgot-password {
-    text-align: right;
-    margin-top: 10px;
+/* Form group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #008080;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #ffc107;
+  box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+}
+
+/* Buttons */
+button[type="submit"],
+.submit-btn {
+  width: 100%;
+  padding: 12px 0;
+  background-color: #008080;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button[type="submit"]:hover,
+.submit-btn:hover {
+  background-color: #006666;
+}
+
+/* Messages */
+.error-message {
+  color: red;
+  margin-bottom: 10px;
+}
+
+.success-message {
+  color: green;
+  margin-bottom: 10px;
+}
+
+/* Footer / links */
+.forgot-password,
+p span {
+  color: #008080;
+  font-weight: bold;
+  cursor: pointer;
 }
