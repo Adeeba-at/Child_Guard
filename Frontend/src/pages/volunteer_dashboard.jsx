@@ -1,13 +1,9 @@
 // src/pages/VolunteerDashboard.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
-import UserProfile from "../components/User/UserProfile";
-import VolunteerAvailability from "../components/volunteer/VolunteerAvailability";
 import VolunteerApprovalRequest from "../components/volunteer/VolunteerApprovalRequest";
-import VolunteerVisits from "../components/volunteer/VolunteerVisits";
-
 import "./volunteer_dashboard.css";
 
 const VolunteerDashboard = () => {
@@ -15,7 +11,6 @@ const VolunteerDashboard = () => {
   const [volunteer, setVolunteer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [activeSection, setActiveSection] = useState("profile"); // default section
 
   const API_URL = "http://localhost:5000/";
 
@@ -29,7 +24,8 @@ const VolunteerDashboard = () => {
       });
 
       let vol = res.data.volunteer;
-
+      
+      // Basic parsing if needed for logic
       if (vol.availability) {
         try {
           vol.availability = JSON.parse(vol.availability);
@@ -39,11 +35,6 @@ const VolunteerDashboard = () => {
       }
 
       setVolunteer(vol);
-
-      // Automatically set section for pending volunteers
-      if (vol.status === "pending") {
-        setActiveSection("approval");
-      }
     } catch (err) {
       console.error(err);
       setMessage("Failed to load volunteer data.");
@@ -56,80 +47,91 @@ const VolunteerDashboard = () => {
     if (volunteerId) fetchVolunteerData();
   }, [volunteerId]);
 
-  if (loading) return <p>Loading dashboard...</p>;
-  if (!volunteer) return <p>{message || "No volunteer data found."}</p>;
+  if (loading) return <div className="volunteer-dashboard"><p>Loading dashboard...</p></div>;
+  if (!volunteer) return <div className="volunteer-dashboard"><p>{message || "No volunteer data found."}</p></div>;
 
-  // If volunteer is in 'requested' status, show pending message
+  // VIEW 1: REQUESTED STATUS
   if (volunteer.status === "requested") {
     return (
       <div className="volunteer-dashboard">
-        <p>Your request is pending approval.</p>
+        <h1>Volunteer Dashboard</h1>
+        <p className="volunteer-subtitle">Status Check</p>
+        <div className="volunteer-card">
+            <div className="card-header">Status</div>
+            <div className="nav-card-body">
+              <h2>Pending Approval</h2>
+              <p>Your request has been submitted and is currently pending administrator approval. Please check back later.</p>
+            </div>
+        </div>
       </div>
     );
   }
 
+  // VIEW 2: PENDING INFO REQUIRED
+  if (volunteer.status === "pending") {
+    return (
+      <div className="volunteer-dashboard">
+         <h1>Complete Your Application</h1>
+         <p className="volunteer-subtitle">Please provide the missing details below</p>
+         <div className="dashboard-content">
+            <VolunteerApprovalRequest
+              volunteer={volunteer}
+              setVolunteer={setVolunteer}
+              setMessage={setMessage}
+            />
+         </div>
+      </div>
+    );
+  }
+
+  // VIEW 3: MAIN DASHBOARD HUB (Approved)
   return (
     <div className="volunteer-dashboard">
-      {/* Clickable cards for sections */}
-      {volunteer.status === "approved" && (
-        <div className="dashboard-sections">
-          <div
-            className="section-card"
-            onClick={() => setActiveSection("profile")}
-          >
-            Profile
+        
+      <h1>Volunteer Dashboard</h1>
+      <p className="volunteer-subtitle">Manage your availability and visits</p>
+
+      <div className="dashboard-tabs">
+          
+        {/* REMOVED: Profile Card (Accessible via NavBar) */}
+
+        {/* 1. Availability Link */}
+        <Link 
+          to={`/volunteer/${volunteerId}/availability`} 
+          className="nav-card"
+        >
+          <div className="card-header">Schedule</div>
+          <div className="nav-card-body">
+            <h2>Availability</h2>
+            <p>Set the days and times you are available to help</p>
           </div>
-          <div
-            className="section-card"
-            onClick={() => setActiveSection("availability")}
-          >
-            Availability
+        </Link>
+
+        {/* 2. Assigned Visits Link */}
+        <Link 
+          to={`/volunteer/${volunteerId}/visits`} 
+          className="nav-card"
+        >
+          <div className="card-header">Tasks</div>
+          <div className="nav-card-body">
+            <h2>Assigned Visits</h2>
+            <p>View your upcoming visits and pending assignments</p>
           </div>
-          <div
-            className="section-card"
-            onClick={() => setActiveSection("visits")}
-          >
-            Assigned Visits
+        </Link>
+
+        {/* 3. Completed Visits Link */}
+        <Link 
+          to={`/volunteer/${volunteerId}/completed`} 
+          className="nav-card"
+        >
+          <div className="card-header">History</div>
+          <div className="nav-card-body">
+            <h2>Completed Visits</h2>
+            <p>Review your history of completed case visits</p>
           </div>
-          <div
-            className="section-card"
-            onClick={() => setActiveSection("completed")}
-          >
-            Completed Visits
-          </div>
-        </div>
-      )}
+        </Link>
 
-      {/* Render section content */}
-      {volunteer.status === "pending" && activeSection === "approval" && (
-        <VolunteerApprovalRequest
-          volunteer={volunteer}
-          setVolunteer={setVolunteer}
-          setMessage={setMessage}
-        />
-      )}
-
-      {volunteer.status === "approved" && activeSection === "profile" && (
-        <UserProfile userId={volunteerId} />
-      )}
-
-      {volunteer.status === "approved" && activeSection === "availability" && (
-        <VolunteerAvailability
-          volunteer={volunteer}
-          setVolunteer={setVolunteer}
-        />
-      )}
-
-      {volunteer.status === "approved" && activeSection === "visits" && (
-        <VolunteerVisits volunteerId={volunteer.volunteer_id} only="pending" />
-      )}
-
-      {volunteer.status === "approved" && activeSection === "completed" && (
-        <VolunteerVisits
-          volunteerId={volunteer.volunteer_id}
-          only="completed"
-        />
-      )}
+      </div>
     </div>
   );
 };
