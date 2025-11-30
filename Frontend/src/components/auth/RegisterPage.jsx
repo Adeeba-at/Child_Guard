@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // src/components/auth/RegisterPage.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -8,9 +9,26 @@ function RegisterPage({ selectedRole = 'sponsor' }) {  // ← RECEIVE role from 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState(''); // ← will be set from selectedRole
+=======
+// src/components/RegisterPage.js
+import React, { useState } from 'react';
+import axios from 'axios';
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
+import './RegisterPage.css'; 
+
+function RegisterPage({ openPanel }) {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('');
+>>>>>>> origin/main
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  
+  // Only one state needed now
+  const [showPassword, setShowPassword] = useState(false);
 
   // Auto-set role when modal opens (from HomePage)
   useEffect(() => {
@@ -21,12 +39,19 @@ function RegisterPage({ selectedRole = 'sponsor' }) {  // ← RECEIVE role from 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
     setSuccess('');
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match!");
+      return;
+    }
+
+    setLoading(true);
+
     try {
       const API_URL = 'http://localhost:5000/api/auth/register';
+<<<<<<< HEAD
 
       const payload = {
         username: username.trim(),     // ← backend expects "name", not "username"
@@ -45,6 +70,28 @@ function RegisterPage({ selectedRole = 'sponsor' }) {  // ← RECEIVE role from 
     } catch (err) {
       const msg = err.response?.data?.message || err.response?.data?.details || 'Registration failed';
       setError(msg);
+=======
+      const payload = { username: username.trim(), email: email.trim(), password, role };
+      // eslint-disable-next-line no-unused-vars
+      const response = await axios.post(API_URL, payload);
+
+      setSuccess('Registration successful! Redirecting to login...');
+      setUsername('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      setRole('');
+
+      setTimeout(() => { if (openPanel) openPanel('login'); }, 1000);
+    } catch (err) {
+      if (err.response && err.response.data) {
+        setError(err.response.data.message || JSON.stringify(err.response.data));
+      } else if (err.request) {
+        setError('Cannot connect to the server.');
+      } else {
+        setError('An unexpected error occurred.');
+      }
+>>>>>>> origin/main
     } finally {
       setLoading(false);
     }
@@ -53,12 +100,19 @@ function RegisterPage({ selectedRole = 'sponsor' }) {  // ← RECEIVE role from 
   return (
     <div className="register-container">
       <h1>Register</h1>
+<<<<<<< HEAD
 
       {success && <p className="success-message">{success}</p>}
       {error && <p className="error-message">{error}</p>}
+=======
+      <form onSubmit={handleSubmit}>
+        {error && <p className="error-message">{error}</p>}
+        {success && <p className="success-message">{success}</p>}
+>>>>>>> origin/main
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
+<<<<<<< HEAD
           <label>Full Name:</label>
           <input
             type="text"
@@ -68,10 +122,15 @@ function RegisterPage({ selectedRole = 'sponsor' }) {  // ← RECEIVE role from 
             disabled={loading}
             placeholder="Enter your name"
           />
+=======
+          <label>Username:</label>
+          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required disabled={loading} placeholder="Enter username" />
+>>>>>>> origin/main
         </div>
 
         <div className="form-group">
           <label>Email:</label>
+<<<<<<< HEAD
           <input
             type="email"
             value={email}
@@ -80,10 +139,15 @@ function RegisterPage({ selectedRole = 'sponsor' }) {  // ← RECEIVE role from 
             disabled={loading}
             placeholder="Enter mail"
           />
+=======
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} placeholder="Enter email" />
+>>>>>>> origin/main
         </div>
 
-        <div className="form-group">
+        {/* --- Password Field (HAS EYE ICON) --- */}
+        <div className="form-group password-group">
           <label>Password:</label>
+<<<<<<< HEAD
           <input
             type="password"
             value={password}
@@ -105,6 +169,44 @@ function RegisterPage({ selectedRole = 'sponsor' }) {  // ← RECEIVE role from 
             style={{ padding: "12px", fontSize: "1em" }}
           >
             <option value="">Choose your role</option>
+=======
+          <div className="password-wrapper">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+              placeholder="Enter password"
+            />
+            <span className="password-toggle" onClick={() => setShowPassword(prev => !prev)}>
+              {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
+            </span>
+          </div>
+        </div>
+
+        {/* --- Confirm Password Field (NO EYE ICON) --- */}
+        <div className="form-group password-group">
+          <label>Confirm Password:</label>
+          <div className="password-wrapper">
+            <input
+              type="password" /* Always hidden */
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              disabled={loading}
+              placeholder="Confirm password"
+            />
+            {/* Toggle span removed from here */}
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>Role:</label>
+          <select value={role} onChange={(e) => setRole(e.target.value)} required disabled={loading}>
+            <option value="">Select Role</option>
+            <option value="parent">Parent</option>
+>>>>>>> origin/main
             <option value="sponsor">Sponsor</option>
             <option value="parent">Parent</option>
             <option value="volunteer">Volunteer</option>
@@ -112,6 +214,7 @@ function RegisterPage({ selectedRole = 'sponsor' }) {  // ← RECEIVE role from 
           </select>
         </div>
 
+<<<<<<< HEAD
         <button 
           type="submit" 
           disabled={loading}
@@ -130,6 +233,9 @@ function RegisterPage({ selectedRole = 'sponsor' }) {  // ← RECEIVE role from 
         >
           {loading ? 'Creating Account...' : 'Register Now'}
         </button>
+=======
+        <button type="submit" disabled={loading}>{loading ? 'Registering...' : 'Register'}</button>
+>>>>>>> origin/main
       </form>
 
       <p style={{ textAlign: "center", marginTop: "20px", fontSize: "0.9em", color: "#666" }}>
