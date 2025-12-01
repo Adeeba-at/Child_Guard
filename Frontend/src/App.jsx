@@ -1,18 +1,20 @@
 // src/App.jsx
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 // Pages
 import HomePage from "./pages/HomePage.jsx";
 import VolunteerDashboard from "./pages/volunteer_dashboard.jsx"; 
-import AdminAwarenessDashboard from "./pages/AdminAwarenessDashboard.jsx";  
-import AdminVolunteerDashboard from "./pages/AdminVolunteerDashboard.jsx";  
-import AdminDashboardHub from "./pages/AdminDashboardHub.jsx";  
-import About from "./pages/About.jsx"; // <-- Import About page
+import AdminAwarenessDashboard from "./pages/AdminAwarenessDashboard.jsx";   
+import AdminVolunteerDashboard from "./pages/AdminVolunteerDashboard.jsx";   
+import AdminDashboardHub from "./pages/AdminDashboardHub.jsx";   
+import About from "./pages/About.jsx";
 
 // Components
 import NavBar from "./components/Navbar.jsx"; 
-import UserProfile from "./components/User/UserProfile.jsx"; // Ensure default export
+import UserProfile from "./components/User/UserProfile.jsx";
+import VolunteerAvailability from "./components/volunteer/VolunteerAvailability.jsx"; 
+import VolunteerVisits from "./components/volunteer/VolunteerVisits.jsx"; 
 
 import './App.css';
 
@@ -53,7 +55,6 @@ function App() {
 
   return (
     <div className="App">
-      {/* NavBar */}
       <NavBar user={user} onLogout={handleLogout} openPanel={openPanel} />
 
       <Routes>
@@ -77,14 +78,44 @@ function App() {
             )
           } 
         />
+        
+        {/* Volunteer Hub */}
         <Route path="/volunteer/:volunteerId/dashboard" element={<VolunteerDashboard />} />
+
+        {/* Volunteer Sub-Pages */}
+        <Route path="/volunteer/:volunteerId/availability" element={<VolunteerAvailabilityWrapper />} />
+        <Route path="/volunteer/:volunteerId/visits" element={<VolunteerVisitsWrapper type="pending" />} />
+        <Route path="/volunteer/:volunteerId/completed" element={<VolunteerVisitsWrapper type="completed" />} />
+
+        {/* Admin Routes */}
         <Route path="/admin/awareness" element={<AdminAwarenessDashboard />} />
         <Route path="/admin/volunteers" element={<AdminVolunteerDashboard />} />
         <Route path="/admin" element={<AdminDashboardHub />} />
-        <Route path="/about" element={<About />} /> {/* <-- About Us Route */}
+        
+        <Route path="/about" element={<About />} />
       </Routes>
     </div>
   );
 }
+
+// --- Wrapper Components ---
+
+const VolunteerAvailabilityWrapper = () => {
+  const { volunteerId } = useParams();
+  return (
+    <div className="dashboard-container">
+      <VolunteerAvailability volunteerId={volunteerId} />
+    </div>
+  );
+};
+
+const VolunteerVisitsWrapper = ({ type }) => {
+  const { volunteerId } = useParams();
+  return (
+    <div className="dashboard-container">
+      <VolunteerVisits volunteerId={volunteerId} only={type} />
+    </div>
+  );
+};
 
 export default App;
