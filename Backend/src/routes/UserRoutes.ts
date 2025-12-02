@@ -25,4 +25,4 @@ router.put("/profile/:user_id", (req, res) => {
   return res.json(updatedProfile);
 });
 
-export default router;
+export default router;

@@ -97,6 +97,9 @@ function HomePage({ user, onLogin }) {
       case 'admin':
         navigate('/admin');
         break;
+      case 'parent':   // ⬅⬅⬅ ADDED THIS
+          navigate('/parent/dashboard');
+          break;
       default:
         navigate('/');
     }

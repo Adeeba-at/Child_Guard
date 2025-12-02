@@ -21,6 +21,8 @@ if (!fs.existsSync(uploadsDir)) {
 }
 app.use('/uploads', express.static(uploadsDir)); 
 
+app.use('/challans', express.static(path.join(__dirname, '../public/challans')));
+
 // ── Mount ALL routes under /api ─────────────
 app.use('/api', routes);  // ✅ This registers ALL routes from index.ts
 

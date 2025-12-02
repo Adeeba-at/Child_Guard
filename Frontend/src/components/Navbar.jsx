@@ -25,6 +25,9 @@ function NavBar({ user, onLogout, openPanel }) {
         case 'admin':
           navigate('/admin');
           break;
+        case 'parent':   
+          navigate('/parent/dashboard');
+          break;
         default:
           navigate('/');
       }
