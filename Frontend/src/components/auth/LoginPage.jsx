@@ -11,14 +11,14 @@ function LoginPage({ onLogin, closeModal }) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const [forgotMode, setForgotMode] = useState(false); // toggle forgot/reset view
+  const [forgotMode, setForgotMode] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [resetToken, setResetToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMessage, setForgotMessage] = useState('');
-  const [resetMode, setResetMode] = useState(false); // step 2: reset password
+  const [resetMode, setResetMode] = useState(false);
 
   const navigate = useNavigate();
 
@@ -53,6 +53,7 @@ function LoginPage({ onLogin, closeModal }) {
 
       if (role === 'volunteer') navigate(`/volunteer/${userId}/dashboard`);
       else if (role === 'admin') navigate('/admin');
+      else if (role === 'sponsor') navigate(`/sponsor/${userId}/dashboard`);
       else navigate('/');
     } catch (err) {
       console.error('Login Error:', err);
@@ -64,7 +65,7 @@ function LoginPage({ onLogin, closeModal }) {
     }
   };
 
-  // --- FORGOT PASSWORD (Step 1) ---
+  // --- FORGOT PASSWORD ---
   const handleForgotSubmit = async (e) => {
     e.preventDefault();
     setForgotLoading(true);
@@ -76,7 +77,7 @@ function LoginPage({ onLogin, closeModal }) {
       const response = await axios.post(API_URL, { email: forgotEmail });
 
       setForgotMessage(response.data.message || 'Reset token sent!');
-      setResetMode(true); // move to reset step
+      setResetMode(true);
     } catch (err) {
       console.error('Forgot Password Error:', err);
       if (err.response) setForgotMessage(err.response.data.message || 'Error sending reset link.');
@@ -86,7 +87,7 @@ function LoginPage({ onLogin, closeModal }) {
     }
   };
 
-  // --- RESET PASSWORD (Step 2) ---
+  // --- RESET PASSWORD ---
   const handleResetSubmit = async (e) => {
     e.preventDefault();
     setForgotLoading(true);
@@ -169,7 +170,6 @@ function LoginPage({ onLogin, closeModal }) {
           </form>
         </>
       ) : !resetMode ? (
-        // --- FORGOT PASSWORD FORM ---
         <>
           <h1>Forgot Password</h1>
           <form className="login-form" onSubmit={handleForgotSubmit}>
@@ -206,7 +206,6 @@ function LoginPage({ onLogin, closeModal }) {
           </form>
         </>
       ) : (
-        // --- RESET PASSWORD FORM ---
         <>
           <h1>Reset Password</h1>
           <form className="login-form" onSubmit={handleResetSubmit}>

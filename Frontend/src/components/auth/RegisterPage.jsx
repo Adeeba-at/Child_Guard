@@ -1,10 +1,9 @@
-// src/components/RegisterPage.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
-import './RegisterPage.css'; 
+import './RegisterPage.css';
 
-function RegisterPage({ openPanel }) {
+function RegisterPage({ onLogin }) { // onLogin passed from HomePage
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,8 +12,6 @@ function RegisterPage({ openPanel }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
-  // Only one state needed now
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -32,17 +29,31 @@ function RegisterPage({ openPanel }) {
     try {
       const API_URL = 'http://localhost:5000/api/auth/register';
       const payload = { username: username.trim(), email: email.trim(), password, role };
-      // eslint-disable-next-line no-unused-vars
-      const response = await axios.post(API_URL, payload);
 
-      setSuccess('Registration successful! Redirecting to login...');
+      // Register
+      await axios.post(API_URL, payload);
+      setSuccess('Registration successful! Logging you in...');
+
+      // Auto-login after registration
+      const loginRes = await axios.post('http://localhost:5000/api/auth/login', {
+        email: email.trim(),
+        password
+      });
+
+      // Save token & user info
+      localStorage.setItem('token', loginRes.data.token);
+      localStorage.setItem('user', JSON.stringify(loginRes.data.user));
+
+      // Notify HomePage about login
+      if (onLogin) onLogin(loginRes.data.user, loginRes.data.token);
+
+      // Clear fields
       setUsername('');
       setEmail('');
       setPassword('');
       setConfirmPassword('');
       setRole('');
 
-      setTimeout(() => { if (openPanel) openPanel('login'); }, 1000);
     } catch (err) {
       if (err.response && err.response.data) {
         setError(err.response.data.message || JSON.stringify(err.response.data));
@@ -59,6 +70,7 @@ function RegisterPage({ openPanel }) {
   return (
     <div className="register-container">
       <h1>Register</h1>
+
       <form onSubmit={handleSubmit}>
         {error && <p className="error-message">{error}</p>}
         {success && <p className="success-message">{success}</p>}
@@ -73,7 +85,6 @@ function RegisterPage({ openPanel }) {
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} placeholder="Enter email" />
         </div>
 
-        {/* --- Password Field (HAS EYE ICON) --- */}
         <div className="form-group password-group">
           <label>Password:</label>
           <div className="password-wrapper">
@@ -91,19 +102,10 @@ function RegisterPage({ openPanel }) {
           </div>
         </div>
 
-        {/* --- Confirm Password Field (NO EYE ICON) --- */}
         <div className="form-group password-group">
           <label>Confirm Password:</label>
           <div className="password-wrapper">
-            <input
-              type="password" /* Always hidden */
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              disabled={loading}
-              placeholder="Confirm password"
-            />
-            {/* Toggle span removed from here */}
+            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required disabled={loading} placeholder="Confirm password" />
           </div>
         </div>
 

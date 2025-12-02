@@ -1,16 +1,17 @@
 // src/pages/VolunteerDashboard.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import VolunteerApprovalRequest from "../components/volunteer/VolunteerApprovalRequest";
-import AssignedVisits from "../components/volunteer/AssignedVisits"; 
+import AssignedVisits from "../components/volunteer/AssignedVisits";
 import VolunteerVisits from "../components/volunteer/VolunteerVisits";
 
 import "./volunteer_dashboard.css";
 
 const VolunteerDashboard = () => {
   const { volunteerId } = useParams();
+  const navigate = useNavigate();
   const [volunteer, setVolunteer] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -28,7 +29,7 @@ const VolunteerDashboard = () => {
       });
 
       let vol = res.data.volunteer;
-      if (vol.availability) {
+      if (vol && vol.availability) {
         try {
           vol.availability = JSON.parse(vol.availability);
         } catch {
@@ -50,88 +51,121 @@ const VolunteerDashboard = () => {
 
   if (loading)
     return (
-      <div className="volunteer-dashboard">
-        <p>Loading dashboard...</p>
+      <div className="volunteer-hub">
+        <h1 className="hub-title">Volunteer Dashboard</h1>
+        <p className="hub-subtitle">Loading your profile...</p>
+        <div className="hub-cards centered-view">
+          <div className="hub-card single-card">
+            <div className="hub-badge">LOADING</div>
+            <h2>Please Wait</h2>
+            <p>We are fetching your dashboard details.</p>
+          </div>
+        </div>
       </div>
     );
 
   if (!volunteer)
     return (
-      <div className="volunteer-dashboard">
-        <p>{message || "No volunteer data found."}</p>
+      <div className="volunteer-hub">
+        <h1 className="hub-title">Volunteer Dashboard</h1>
+        <p className="hub-subtitle">Error Encountered</p>
+        <div className="hub-cards centered-view">
+          <div className="hub-card single-card">
+            <div className="hub-badge">ERROR</div>
+            <h2>No Data Found</h2>
+            <p>{message || "We couldn't find your volunteer profile."}</p>
+          </div>
+        </div>
       </div>
     );
 
-  // --- VIEW 1: REQUESTED STATUS ---
   if (volunteer.status === "requested") {
     return (
-      <div className="volunteer-dashboard">
-        <h1>Volunteer Dashboard</h1>
-        <p className="volunteer-subtitle">Status Check</p>
-        <div className="volunteer-card">
-          <div className="card-header">Status</div>
-          <div className="nav-card-body">
+      <div className="volunteer-hub">
+        <h1 className="hub-title">Volunteer Dashboard</h1>
+        <p className="hub-subtitle">Application Status</p>
+        <div className="hub-cards centered-view">
+          <div className="hub-card single-card">
+            <div className="hub-badge">STATUS</div>
             <h2>Pending Approval</h2>
-            <p>Your request has been submitted and is currently pending administrator approval. Please check back later.</p>
+            <p>
+              Your application has been submitted successfully. Our administrators
+              are currently reviewing your details. We will notify you once a
+              decision is made.
+            </p>
           </div>
         </div>
       </div>
     );
   }
 
-  // --- VIEW 2: PENDING INFO REQUIRED ---
   if (volunteer.status === "pending") {
     return (
-      <div className="volunteer-dashboard">
-        <h1>Complete Your Application</h1>
-        <p className="volunteer-subtitle">Please provide the missing details below</p>
-        <div className="dashboard-content">
-          <VolunteerApprovalRequest
-            volunteer={volunteer}
-            setVolunteer={setVolunteer}
-            setMessage={setMessage}
-          />
-        </div>
-      </div>
+      
+        
+        
+
+            <VolunteerApprovalRequest
+              volunteer={volunteer}
+              setVolunteer={setVolunteer}
+              setMessage={setMessage}
+            />
+         
+      
     );
   }
 
-  // --- VIEW 3: APPROVED DASHBOARD ---
+  
   return (
-    <div className="volunteer-dashboard">
-      <h1>Volunteer Dashboard</h1>
-      <p className="volunteer-subtitle">Welcome back, {volunteer.name || "Volunteer"}</p>
+    <div className="volunteer-hub">
+      <h1 className="hub-title">Welcome, {volunteer.name || "Volunteer"}!</h1>
+      <p className="hub-subtitle">Manage your volunteering activities</p>
 
-      <div className="dashboard-actions">
-        <Link
-          to={`/volunteer/${volunteerId}/availability`}
-          className="action-btn secondary"
+      {/* Cards Grid */}
+      <div className="hub-cards">
+        {/* Card 1: Assigned Tasks */}
+        <div
+          className={`hub-card ${activeTab === "tasks" ? "active-card" : ""}`}
+          onClick={() => setActiveTab("tasks")}
         >
-          📅 Update Availability
-        </Link>
+          <div className="hub-badge">ASSIGNED</div>
+          <h2>Current Tasks</h2>
+          <p>View your upcoming visits, assigned cases, and active responsibilities.</p>
+        </div>
+
+        {/* Card 2: History */}
+        <div
+          className={`hub-card ${activeTab === "history" ? "active-card" : ""}`}
+          onClick={() => setActiveTab("history")}
+        >
+          <div className="hub-badge">HISTORY</div>
+          <h2>Visit History</h2>
+          <p>Review your past volunteer visits, completed reports, and case notes.</p>
+        </div>
+
+        {/* Card 3: Availability */}
+        <div
+          className={`hub-card ${activeTab === "availability" ? "active-card" : ""}`}
+          onClick={() => navigate(`/volunteer/${volunteerId}/availability`)}
+        >
+          <div className="hub-badge">AVAILABILITY</div>
+          <h2>My Schedule</h2>
+          <p>Update your available days and times to help us assign you relevant tasks.</p>
+        </div>
       </div>
 
-      <hr className="divider" />
-
-      {/* Tabs */}
-      <div className="dashboard-tabs-control">
-        <button
-          className={`tab-btn ${activeTab === 'tasks' ? 'active' : ''}`}
-          onClick={() => setActiveTab('tasks')}
-        >
-          Assigned Tasks
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
-          onClick={() => setActiveTab('history')}
-        >
-          History (Completed)
-        </button>
-      </div>
-
-      <div className="dashboard-content-area fade-in">
-        {activeTab === 'tasks' && <AssignedVisits volunteerId={volunteerId} />}
-        {activeTab === 'history' && <VolunteerVisits volunteerId={volunteerId} />}
+      {/* Dynamic Content Panel */}
+      <div className="dashboard-content-panel">
+        {activeTab === "tasks" && (
+          <div className="animate-fade-in">
+            <AssignedVisits volunteerId={volunteerId} />
+          </div>
+        )}
+        {activeTab === "history" && (
+          <div className="animate-fade-in">
+            <VolunteerVisits volunteerId={volunteerId} />
+          </div>
+        )}
       </div>
     </div>
   );

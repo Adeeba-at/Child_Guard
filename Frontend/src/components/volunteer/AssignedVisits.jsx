@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./VolunteerVisits.css";
+import "./AssignedVisits.css";
 
 const AssignedVisits = ({ volunteerId }) => {
   const [assignedVisits, setAssignedVisits] = useState([]);
-  const [feedbackText, setFeedbackText] = useState(""); // Track input for feedback
-  const [activeVisitId, setActiveVisitId] = useState(null); // Track which visit is being updated
+  const [feedbackText, setFeedbackText] = useState(""); 
+  const [activeVisitId, setActiveVisitId] = useState(null); 
 
   const API_URL = "http://localhost:5000/";
 
@@ -28,15 +28,14 @@ const AssignedVisits = ({ volunteerId }) => {
   }, [volunteerId]);
 
   const handleFeedbackSubmit = async (visitId) => {
+    if (!feedbackText.trim()) {
+      alert("Feedback cannot be empty");
+      return;
+    }
+
     try {
-      if (!feedbackText.trim()) {
-        alert("Feedback cannot be empty");
-        return;
-      }
-
       const token = localStorage.getItem("authToken");
-
-      const res = await axios.put(
+      await axios.put(
         `${API_URL}visits/${visitId}/feedback`,
         { findings: feedbackText },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -45,7 +44,7 @@ const AssignedVisits = ({ volunteerId }) => {
       alert("Feedback submitted successfully!");
       setFeedbackText("");
       setActiveVisitId(null);
-      fetchAssignedVisits(); // Refresh visits list
+      fetchAssignedVisits(); 
     } catch (err) {
       console.error("Error submitting feedback:", err);
       alert("Failed to submit feedback.");
@@ -63,7 +62,12 @@ const AssignedVisits = ({ volunteerId }) => {
           <div key={visit.visit_id} className="visit-card assigned-card">
             <p><strong>Target ID:</strong> {visit.target_id}</p>
             <p><strong>Scheduled Date:</strong> {new Date(visit.visit_date).toLocaleDateString()}</p>
-            <p><strong>Status:</strong> <span className="status-badge pending">{visit.status}</span></p>
+            <p>
+              <strong>Status:</strong> 
+              <span className={`status-badge ${visit.status === "completed" ? "status-completed" : "status-assigned"}`}>
+                {visit.status}
+              </span>
+            </p>
 
             {activeVisitId === visit.visit_id ? (
               <div className="feedback-section">
@@ -73,22 +77,24 @@ const AssignedVisits = ({ volunteerId }) => {
                   onChange={(e) => setFeedbackText(e.target.value)}
                   rows={3}
                 />
-                <button
-                  className="action-btn"
-                  onClick={() => handleFeedbackSubmit(visit.visit_id)}
-                >
-                  Submit Feedback
-                </button>
-                <button
-                  className="action-btn cancel"
-                  onClick={() => setActiveVisitId(null)}
-                >
-                  Cancel
-                </button>
+                <div className="feedback-actions">
+                  <button
+                    className="btn-submit"
+                    onClick={() => handleFeedbackSubmit(visit.visit_id)}
+                  >
+                    Submit
+                  </button>
+                  <button
+                    className="btn-cancel"
+                    onClick={() => setActiveVisitId(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             ) : (
               <button
-                className="action-btn"
+                className="btn-action"
                 onClick={() => setActiveVisitId(visit.visit_id)}
               >
                 Add Feedback

@@ -89,13 +89,15 @@ function HomePage({ user, onLogin }) {
   const goToDashboard = () => {
     if (!user) return openPanel('login');
 
-    // Role-based navigation
     switch (user.role) {
       case 'volunteer':
         navigate(`/volunteer/${user.id}/dashboard`);
         break;
       case 'admin':
         navigate('/admin');
+        break;
+      case 'sponsor':
+        navigate(`/sponsor/${user.id}/dashboard`);
         break;
       default:
         navigate('/');
@@ -208,7 +210,7 @@ function HomePage({ user, onLogin }) {
         &copy; 2025 ChildGuard. All Rights Reserved.
       </footer>
 
-      {/* ——————— EMERGENCY WHATSAPP FLOATING BUTTON ——————— */}
+      {/* Emergency WhatsApp Floating Button */}
       <a
         href="https://wa.me/923216604318?text=EMERGENCY%20CHILD%20IN%20DANGER%21%0A%0AI%20am%20reporting%20a%20child%20in%20immediate%20danger%21%0APlease%20reply%20NOW%21"
         target="_blank"
