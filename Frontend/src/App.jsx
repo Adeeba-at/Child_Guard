@@ -1,16 +1,4 @@
 // src/App.jsx
-<<<<<<< HEAD
-import { Routes, Route } from 'react-router-dom';
-import HomePage from "./pages/HomePage.jsx";
-import VolunteerDashboard from "./pages/volunteer_dashboard.jsx"; 
-import AdminAwarenessDashboard from "./pages/AdminAwarenessDashboard.jsx";  
-import AdminVolunteerDashboard from "./pages/AdminVolunteerDashboard.jsx";
-import AdminDashboardHub from "./pages/AdminDashboardHub.jsx";
-
-// NEW SPONSOR PAGES
-import SponsorDashboard from "./pages/SponsorDashboard.jsx";
-import LoginPage from "./components/auth/LoginPage.jsx";
-=======
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
@@ -20,12 +8,12 @@ import VolunteerDashboard from "./pages/volunteer_dashboard.jsx";
 import AdminAwarenessDashboard from "./pages/AdminAwarenessDashboard.jsx";  
 import AdminVolunteerDashboard from "./pages/AdminVolunteerDashboard.jsx";  
 import AdminDashboardHub from "./pages/AdminDashboardHub.jsx";  
-import About from "./pages/About.jsx"; // <-- Import About page
+import SponsorDashboard from "./pages/SponsorDashboard.jsx";
 
 // Components
 import NavBar from "./components/Navbar.jsx"; 
-import UserProfile from "./components/User/UserProfile.jsx"; // Ensure default export
->>>>>>> origin/main
+import UserProfile from "./components/User/UserProfile.jsx";
+import LoginPage from "./components/auth/LoginPage.jsx";
 
 import './App.css';
 
@@ -70,10 +58,9 @@ function App() {
       <NavBar user={user} onLogout={handleLogout} openPanel={openPanel} />
 
       <Routes>
-<<<<<<< HEAD
         {/* Public */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<HomePage user={user} onLogin={handleLoginSuccess} />} />
+        <Route path="/login" element={<LoginPage onLoginSuccess={handleLoginSuccess} />} />
 
         {/* Volunteer */}
         <Route path="/volunteer/:volunteerId/dashboard" element={<VolunteerDashboard />} />
@@ -85,11 +72,8 @@ function App() {
 
         {/* Sponsor */}
         <Route path="/sponsor/dashboard" element={<SponsorDashboard />} />
-=======
-        <Route 
-          path="/" 
-          element={<HomePage user={user} onLogin={handleLoginSuccess} />} 
-        />
+
+        {/* User Profile */}
         <Route 
           path="/dashboard" 
           element={
@@ -106,12 +90,6 @@ function App() {
             )
           } 
         />
-        <Route path="/volunteer/:volunteerId/dashboard" element={<VolunteerDashboard />} />
-        <Route path="/admin/awareness" element={<AdminAwarenessDashboard />} />
-        <Route path="/admin/volunteers" element={<AdminVolunteerDashboard />} />
-        <Route path="/admin" element={<AdminDashboardHub />} />
-        <Route path="/about" element={<About />} /> {/* <-- About Us Route */}
->>>>>>> origin/main
       </Routes>
     </div>
   );

@@ -1,4 +1,3 @@
-// src/pages/HomePage.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -8,12 +7,11 @@ import ReportCase from "../components/case/ReportCase";
 import './HomePage.css';
 import HeroImage from '../assets/child-future-contrast.jpg';
 
-// Accept user and onLogin props from App.js
 function HomePage({ user, onLogin }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('login');
   const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState('sponsor'); // ← NEW: Track role
+  const [selectedRole, setSelectedRole] = useState('sponsor');
   const [awarenessContent, setAwarenessContent] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,8 +22,6 @@ function HomePage({ user, onLogin }) {
     { title: "Transparent Tracking", icon: "✔️", description: "Offer sponsors and parents real-time updates on child progress." },
   ];
 
-<<<<<<< HEAD
-=======
   // Listen for NavBar events
   useEffect(() => {
     const handleAuthEvent = (e) => openPanel(e.detail);
@@ -34,7 +30,6 @@ function HomePage({ user, onLogin }) {
   }, []);
 
   // Fetch awareness content
->>>>>>> origin/main
   useEffect(() => {
     const fetchAwareness = async () => {
       try {
@@ -49,7 +44,6 @@ function HomePage({ user, onLogin }) {
     fetchAwareness();
   }, []);
 
-  // UPDATED: Now accepts role
   const openPanel = (tab, role = 'sponsor') => {
     setActiveTab(tab);
     setSelectedRole(role);
@@ -58,14 +52,7 @@ function HomePage({ user, onLogin }) {
 
   const closeModal = () => setIsPanelOpen(false);
 
-<<<<<<< HEAD
-  const getEmbedUrl = (url) => {
-    if (!url) return "";
-    return url.replace("watch?v=", "embed/").replace("&", "?");
-  };
-=======
   const getEmbedUrl = (url) => url ? url.replace("watch?v=", "embed/").replace("&", "?") : "";
->>>>>>> origin/main
 
   const openFullArticle = (item) => {
     const win = window.open('', '_blank', 'width=900,height=700,scrollbars=yes,resizable=yes');
@@ -102,13 +89,15 @@ function HomePage({ user, onLogin }) {
   const goToDashboard = () => {
     if (!user) return openPanel('login');
 
-    // Role-based navigation
     switch (user.role) {
       case 'volunteer':
         navigate(`/volunteer/${user.id}/dashboard`);
         break;
       case 'admin':
         navigate('/admin');
+        break;
+      case 'sponsor':
+        navigate('/sponsor/dashboard');
         break;
       default:
         navigate('/');
@@ -117,14 +106,12 @@ function HomePage({ user, onLogin }) {
 
   return (
     <div className="home-page-container">
-<<<<<<< HEAD
-
       {/* TOP RIGHT NAVIGATION */}
       <nav className="auth-top-right">
         <button className="top-tab" onClick={() => openPanel('login')}>Login</button>
         <button 
           className="top-tab register-btn" 
-          onClick={() => openPanel('register', 'sponsor')} // ← Default to sponsor
+          onClick={() => openPanel('register', 'sponsor')}
         >
           Register
         </button>
@@ -132,36 +119,19 @@ function HomePage({ user, onLogin }) {
       </nav>
 
       {/* MAIN MODAL */}
-=======
-      
-      {/* Modal Logic */}
->>>>>>> origin/main
       {isPanelOpen && (
         <div className="auth-modal-overlay" onClick={closeModal}>
           <div className="auth-modal" onClick={e => e.stopPropagation()}>
             <button className="close-btn" onClick={closeModal}>×</button>
             <div className="form-body">
               <div className="modal-content-area">
-<<<<<<< HEAD
-                {activeTab === 'login' && <LoginPage />}
-                
-                {/* PASS THE ROLE TO RegisterPage */}
-                {activeTab === 'register' && <RegisterPage selectedRole={selectedRole} />}
-                
-                {activeTab === 'about' && (
-                  <div className="about-us-content">
-                    <h2>ChildGuard: Our Mission</h2>
-                    <p>ChildGuard is a web-based platform dedicated to protecting children from labor exploitation...</p>
-                    <button className="cta-btn" onClick={() => openPanel('register', 'sponsor')}>Join the Cause</button>
-=======
                 {activeTab === 'login' && <LoginPage onLogin={onLogin} closeModal={closeModal} />}
-                {activeTab === 'register' && <RegisterPage />}
+                {activeTab === 'register' && <RegisterPage selectedRole={selectedRole} />}
                 {activeTab === 'about' && !user && (
                   <div className="about-us-content">
                     <h2>ChildGuard: Our Mission</h2>
                     <p>ChildGuard is a web-based platform dedicated to protecting children from labor exploitation...</p>
-                    <button className="cta-btn" onClick={() => openPanel('register')}>Join us</button>
->>>>>>> origin/main
+                    <button className="cta-btn" onClick={() => openPanel('register', 'sponsor')}>Join the Cause</button>
                   </div>
                 )}
                 {activeTab === 'report' && <ReportCase userId={user ? user.id : null} />}
@@ -179,14 +149,11 @@ function HomePage({ user, onLogin }) {
             A centralized platform to end child labor through <b>Educational Sponsorship</b> and <b>Anonymous Reporting</b>.
           </p>
           <div className="hero-buttons">
-<<<<<<< HEAD
-=======
             {user ? (
               <button className="cta-btn" onClick={goToDashboard}>Go to Dashboard</button>
             ) : (
               <button className="cta-btn" onClick={() => openPanel('register')}>Sponsor a Child Today</button>
             )}
->>>>>>> origin/main
             <button className="cta-btn-outline" onClick={() => openPanel('report')}>Report a Case</button>
           </div>
         </div>
@@ -209,11 +176,7 @@ function HomePage({ user, onLogin }) {
         </div>
       </section>
 
-<<<<<<< HEAD
       {/* AWARENESS SECTION */}
-=======
-      {/* Awareness & Updates */}
->>>>>>> origin/main
       <section className="awareness-section">
         <h2>Public Awareness Content</h2>
         {loading ? (
@@ -239,19 +202,6 @@ function HomePage({ user, onLogin }) {
                 )}
                 <div className="awareness-text">
                   <h3>{item.title}</h3>
-<<<<<<< HEAD
-                  <p dangerouslySetInnerHTML={{ 
-                    __html: item.content.length > 280 
-                      ? item.content.substring(0, 280) + "..." 
-                      : item.content 
-                  }} />
-                  <div className="awareness-footer">
-                    <small>Published on: {item.published_at ? new Date(item.published_at).toLocaleDateString() : "Recently"}</small>
-                    {(item.type === 'article' || item.type === 'guide') && item.content.length > 280 && (
-                      <span className="read-more">Read full article</span>
-                    )}
-                    {item.type === 'video' && <span className="read-more">Watch Video</span>}
-=======
                   <p dangerouslySetInnerHTML={{
                     __html: item.content.length > 280 ? item.content.substring(0, 280) + "..." : item.content
                   }} />
@@ -259,7 +209,6 @@ function HomePage({ user, onLogin }) {
                     <small>Published on: {item.published_at ? new Date(item.published_at).toLocaleDateString() : "Recently"}</small>
                     {(item.type === 'article' || item.type === 'guide') && item.content.length > 280 && <span className="read-more">Read full article →</span>}
                     {item.type === 'video' && <span className="read-more">Watch Video →</span>}
->>>>>>> origin/main
                   </div>
                 </div>
               </div>
@@ -272,9 +221,9 @@ function HomePage({ user, onLogin }) {
         © 2025 ChildGuard. All Rights Reserved.
       </footer>
 
-      {/* ——————— EMERGENCY WHATSAPP FLOATING BUTTON ——————— */}
+      {/* EMERGENCY WHATSAPP BUTTON */}
       <a
-        href="https://wa.me/923216604318?text=EMERGENCY%20CHILD%20IN%20DANGER%21%0A%0AI%20am%20reporting%20a%20child%20in%20immediate%20danger%21%0APlease%20reply%20NOW%21"
+        href="https://wa.me/923216604318?text=EMERGENCY%20CHILD%20IN%20DANGER%21"
         target="_blank"
         rel="noopener noreferrer"
         style={{
@@ -302,18 +251,11 @@ function HomePage({ user, onLogin }) {
         !
       </a>
 
-      {/* Pulsing animation for urgency */}
       <style jsx>{`
         @keyframes pulse {
-          0% {
-            box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.8);
-          }
-          70% {
-            box-shadow: 0 0 0 20px rgba(211, 47, 47, 0);
-          }
-          100% {
-            box-shadow: 0 0 0 0 rgba(211, 47, 47, 0);
-          }
+          0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.8); }
+          70% { box-shadow: 0 0 0 20px rgba(211, 47, 47, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
         }
       `}</style>
     </div>

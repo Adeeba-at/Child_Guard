@@ -1,0 +1,62 @@
+.applications-container {
+  padding: 20px;
+}
+
+.applications-container h2 {
+  text-align: center;
+  color: #003087;
+  margin-bottom: 30px;
+  font-size: 2rem;
+}
+
+.applications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.application-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  border-left: 6px solid #ffc107;
+  transition: transform 0.3s ease;
+}
+
+.application-card:hover {
+  transform: translateY(-5px);
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.app-header h3 {
+  margin: 0;
+  color: #003087;
+  font-size: 1.4rem;
+}
+
+.status-badge {
+  color: white;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.app-details p {
+  margin: 8px 0;
+  color: #444;
+  font-size: 1rem;
+}
+
+.app-details strong {
+  color: #003087;
+}

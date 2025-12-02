@@ -51,14 +51,17 @@ export const sponsorController = {
     }
   },
 
-  // Sponsor: Get profile
+  // Sponsor: Get profile (legacy route)
   me: async (req: AuthRequest, res: Response) => {
-    if (!req.user || req.user.role !== "sponsor")
+    if (!req.user || req.user.role !== "sponsor") {
       return res.status(401).json({ message: "Unauthorized" });
+    }
 
     try {
       const sponsor = await SponsorModel.findById(req.user.user_id);
-      if (!sponsor) return res.status(404).json({ message: "Sponsor not found" });
+      if (!sponsor) {
+        return res.status(404).json({ message: "Sponsor not found" });
+      }
 
       res.json({
         sponsor_id: sponsor.sponsor_id,
@@ -75,20 +78,48 @@ export const sponsorController = {
     }
   },
 
-  // Sponsor: Get sponsored children
-  children: async (req: AuthRequest, res: Response) => {
-    if (!req.user || req.user.role !== "sponsor")
-      return res.status(401).json({ message: "Unauthorized" });
-
+  // NEW: Get sponsored children by sponsor ID
+  getSponsoredChildren: async (req: Request, res: Response) => {
     try {
-      const sponsor = await SponsorModel.findByUserId(req.user.user_id);
-      if (!sponsor) return res.status(404).json({ message: "Sponsor not found" });
-
-      const children = await SponsorModel.getSponsoredChildren(sponsor.sponsor_id);
-      res.json(children);
+      const { sponsorId } = req.params;
+      const children = await SponsorModel.getSponsoredChildren(sponsorId);
+      res.json({ success: true, data: children });
     } catch (err) {
-      console.error("Fetch sponsored children error:", err);
-      res.status(500).json({ message: "Failed to load children" });
+      console.error("Get sponsored children error:", err);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to load sponsored children" 
+      });
+    }
+  },
+
+  // NEW: Get applications for a sponsor
+  getApplications: async (req: Request, res: Response) => {
+    try {
+      const { sponsorId } = req.params;
+      const applications = await SponsorModel.getApplications(sponsorId);
+      res.json({ success: true, data: applications });
+    } catch (err) {
+      console.error("Get applications error:", err);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to load applications" 
+      });
+    }
+  },
+
+  // NEW: Get reports for a sponsor
+  getReports: async (req: Request, res: Response) => {
+    try {
+      const { sponsorId } = req.params;
+      const reports = await SponsorModel.getReports(sponsorId);
+      res.json({ success: true, data: reports });
+    } catch (err) {
+      console.error("Get reports error:", err);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to load reports" 
+      });
     }
   },
 };

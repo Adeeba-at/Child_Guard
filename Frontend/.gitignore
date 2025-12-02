@@ -12,9 +12,9 @@ dist
 dist-ssr
 *.local
 
-Backend/node_modules/
-Frontend/node_modules/
-Backend/childguard.db
+
+/Backend/node_modules/
+/Frontend/node_modules/
 
 
 # Editor directories and files

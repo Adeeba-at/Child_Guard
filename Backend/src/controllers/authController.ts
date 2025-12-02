@@ -26,15 +26,11 @@ export class AuthController {
                 return res.status(400).json({ error: "Invalid user role" });
             }
 
-<<<<<<< HEAD
             // Check if user already exists
-=======
->>>>>>> origin/main
             const existing = db.prepare("SELECT * FROM users WHERE email = ? OR username = ?")
                                .get(email, username);
             if (existing) return res.status(400).json({ error: "User already exists" });
 
-<<<<<<< HEAD
             // Hash password
             const hash = bcrypt.hashSync(password, 10);
 
@@ -44,21 +40,12 @@ export class AuthController {
             // Begin transaction
             const newUser = db.transaction(() => {
                 // Insert into users table
-=======
-            const hash = bcrypt.hashSync(password, 10);
-            const user_id = `USR-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
-            const newUser = db.transaction(() => {
->>>>>>> origin/main
                 db.prepare(`
                     INSERT INTO users (user_id, username, email, password_hash, role)
                     VALUES (?, ?, ?, ?, ?)
                 `).run(user_id, username, email, hash, role);
 
-<<<<<<< HEAD
                 // Insert into role-specific table
-=======
->>>>>>> origin/main
                 switch (role) {
                     case "parent":
                         db.prepare(`
@@ -109,19 +96,13 @@ export class AuthController {
                         break;
                 }
 
-<<<<<<< HEAD
                 // Return the user (without password)
-=======
->>>>>>> origin/main
                 return db.prepare(`
                     SELECT user_id, username, email, role FROM users WHERE user_id = ?
                 `).get(user_id) as AuthResponseUser;
             })();
 
-<<<<<<< HEAD
             // Generate JWT token
-=======
->>>>>>> origin/main
             const token = jwt.sign({ user_id: newUser.user_id, role: newUser.role }, JWT_SECRET, { expiresIn: "1h" });
 
             res.status(201).json({

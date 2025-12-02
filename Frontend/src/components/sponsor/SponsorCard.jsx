@@ -1,9 +1,9 @@
 import React from "react";
 import "./SponsorCard.css";
 
-const SponsorCard = ({ child }) => {
+const SponsorCard = ({ child, onClick }) => {
   return (
-    <div className="child-card">
+    <div className="child-card" onClick={onClick}>
       <img
         src={child.photo || "/default-child.jpg"}
         alt={child.name}

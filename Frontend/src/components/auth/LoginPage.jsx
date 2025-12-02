@@ -1,4 +1,3 @@
-// src/pages/LoginPage.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -10,23 +9,19 @@ function LoginPage({ onLogin, closeModal }) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-<<<<<<< HEAD
-=======
   const [success, setSuccess] = useState('');
 
-  const [forgotMode, setForgotMode] = useState(false); // toggle forgot/reset view
+  const [forgotMode, setForgotMode] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [resetToken, setResetToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMessage, setForgotMessage] = useState('');
-  const [resetMode, setResetMode] = useState(false); // step 2: reset password
+  const [resetMode, setResetMode] = useState(false);
 
->>>>>>> origin/main
   const navigate = useNavigate();
 
-  // --- LOGIN ---
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -36,9 +31,6 @@ function LoginPage({ onLogin, closeModal }) {
       const API_URL = 'http://localhost:5000/api/auth/login';
       const response = await axios.post(API_URL, { email, password });
 
-<<<<<<< HEAD
-      const { token, sponsor, user } = response.data;
-=======
       const { token, user } = response.data;
       const role = user.role;
       const userId = user.user_id;
@@ -48,28 +40,10 @@ function LoginPage({ onLogin, closeModal }) {
         setLoading(false);
         return;
       }
->>>>>>> origin/main
 
-      // Save token with consistent key
       localStorage.setItem('authToken', token);
       if (onLogin) onLogin({ token, role, id: userId });
 
-<<<<<<< HEAD
-
-      // Redirect based on role
-      const role = sponsor?.role || user?.role;
-      const userId = sponsor?.sponsor_id || user?.user_id;
-
-      if (role === 'volunteer') {
-        navigate(`/volunteer/${userId}/dashboard`);
-      } else if (role === 'admin') {
-        navigate('/admin');
-      } else if (role === 'sponsor') {
-        navigate('/sponsor/dashboard');
-      } else {
-        navigate('/');
-      }
-=======
       setSuccess('Login successful!');
       setEmail('');
       setPassword('');
@@ -77,8 +51,8 @@ function LoginPage({ onLogin, closeModal }) {
 
       if (role === 'volunteer') navigate(`/volunteer/${userId}/dashboard`);
       else if (role === 'admin') navigate('/admin');
+      else if (role === 'sponsor') navigate('/sponsor/dashboard');
       else navigate('/');
->>>>>>> origin/main
     } catch (err) {
       console.error('Login Error:', err);
       if (err.response) setError(err.response.data.message || 'Invalid email or password.');
@@ -89,7 +63,6 @@ function LoginPage({ onLogin, closeModal }) {
     }
   };
 
-  // --- FORGOT PASSWORD (Step 1) ---
   const handleForgotSubmit = async (e) => {
     e.preventDefault();
     setForgotLoading(true);
@@ -99,9 +72,8 @@ function LoginPage({ onLogin, closeModal }) {
     try {
       const API_URL = 'http://localhost:5000/api/auth/forgot-password';
       const response = await axios.post(API_URL, { email: forgotEmail });
-
       setForgotMessage(response.data.message || 'Reset token sent!');
-      setResetMode(true); // move to reset step
+      setResetMode(true);
     } catch (err) {
       console.error('Forgot Password Error:', err);
       if (err.response) setForgotMessage(err.response.data.message || 'Error sending reset link.');
@@ -111,7 +83,6 @@ function LoginPage({ onLogin, closeModal }) {
     }
   };
 
-  // --- RESET PASSWORD (Step 2) ---
   const handleResetSubmit = async (e) => {
     e.preventDefault();
     setForgotLoading(true);
@@ -141,11 +112,6 @@ function LoginPage({ onLogin, closeModal }) {
 
   return (
     <div className="login-container">
-<<<<<<< HEAD
-      <h1>Login</h1>
-      <form className="login-form" onSubmit={handleSubmit}>
-        {error && <p className="error-message">{error}</p>}
-=======
       {!forgotMode ? (
         <>
           <h1>Login</h1>
@@ -163,7 +129,6 @@ function LoginPage({ onLogin, closeModal }) {
                 disabled={loading}
               />
             </div>
->>>>>>> origin/main
 
             <div className="form-group password-group">
               <label>Password:</label>
@@ -175,7 +140,7 @@ function LoginPage({ onLogin, closeModal }) {
                   required
                   disabled={loading}
                 />
-                <span className="password-toggle" onClick={() => setShowPassword((prev) => !prev)}>
+                <span className="password-toggle" onClick={() => setShowPassword(prev => !prev)}>
                   {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
                 </span>
               </div>
@@ -189,10 +154,7 @@ function LoginPage({ onLogin, closeModal }) {
               <a
                 href="#"
                 className="link-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setForgotMode(true);
-                }}
+                onClick={(e) => { e.preventDefault(); setForgotMode(true); }}
               >
                 Forgot Password?
               </a>
@@ -200,7 +162,6 @@ function LoginPage({ onLogin, closeModal }) {
           </form>
         </>
       ) : !resetMode ? (
-        // --- FORGOT PASSWORD FORM ---
         <>
           <h1>Forgot Password</h1>
           <form className="login-form" onSubmit={handleForgotSubmit}>
@@ -216,33 +177,19 @@ function LoginPage({ onLogin, closeModal }) {
                 placeholder="Enter your registered email"
               />
             </div>
-
             <button type="submit" className="submit-btn" disabled={forgotLoading}>
               {forgotLoading ? 'Sending...' : 'Send Reset Token'}
             </button>
-
             <p className="forgot-password">
-              <a
-                href="#"
-                className="link-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setForgotMode(false);
-                  setForgotMessage('');
-                }}
-              >
-                Back to Login
-              </a>
+              <a href="#" className="link-btn" onClick={() => setForgotMode(false)}>Back to Login</a>
             </p>
           </form>
         </>
       ) : (
-        // --- RESET PASSWORD FORM ---
         <>
           <h1>Reset Password</h1>
           <form className="login-form" onSubmit={handleResetSubmit}>
             {forgotMessage && <p className="success-message">{forgotMessage}</p>}
-
             <div className="form-group">
               <label>Reset Token:</label>
               <input
@@ -251,10 +198,8 @@ function LoginPage({ onLogin, closeModal }) {
                 onChange={(e) => setResetToken(e.target.value)}
                 required
                 disabled={forgotLoading}
-                placeholder="Enter token from email"
               />
             </div>
-
             <div className="form-group password-group">
               <label>New Password:</label>
               <div className="password-wrapper">
@@ -264,17 +209,18 @@ function LoginPage({ onLogin, closeModal }) {
                   onChange={(e) => setNewPassword(e.target.value)}
                   required
                   disabled={forgotLoading}
-                  placeholder="Enter new password"
                 />
-                <span className="password-toggle" onClick={() => setShowPassword((prev) => !prev)}>
+                <span className="password-toggle" onClick={() => setShowPassword(prev => !prev)}>
                   {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
                 </span>
               </div>
             </div>
-
             <button type="submit" className="submit-btn" disabled={forgotLoading}>
               {forgotLoading ? 'Resetting...' : 'Reset Password'}
             </button>
+            <p className="forgot-password">
+              <a href="#" className="link-btn" onClick={() => setForgotMode(false)}>Back to Login</a>
+            </p>
           </form>
         </>
       )}
