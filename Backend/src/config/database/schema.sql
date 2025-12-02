@@ -230,8 +230,7 @@ BEGIN
 END;
 CREATE TABLE sponsors (
     sponsor_id TEXT PRIMARY KEY,
-    phone TEXT UNIQUE,
-    age INTEGER CHECK(age >= 18 AND age <= 100),
-	occupation TEXT ,
-    FOREIGN KEY(sponsor_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
+    phone TEXT,
+    preferences TEXT, -- JSON: {"age": "5-10", "location": "Lahore"}
+    FOREIGN KEY (sponsor_id) REFERENCES users(user_id) ON DELETE CASCADE
+)

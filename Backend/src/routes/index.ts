@@ -17,7 +17,7 @@ import reportRoutes from './reportRoutes';
 import childRoutes from './childRoutes';
 import applicationRoutes from './applicationRoutes';
 import challanRoutes from './challanRoutes';
-
+import sponsorRoutes from "./sponsorRoutes";
 const router = Router();
 
 // Welcome Message — Updated & Professional
@@ -80,5 +80,5 @@ router.use('/api/reports', reportRoutes);
 router.use('/api/children', childRoutes);
 router.use('/api/applications', applicationRoutes);
 router.use('/api/challans', challanRoutes);
-
+router.use('/sponsor', sponsorRoutes); 
 export default router;

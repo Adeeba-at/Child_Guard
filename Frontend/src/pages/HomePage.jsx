@@ -97,6 +97,9 @@ function HomePage({ user, onLogin }) {
       case 'admin':
         navigate('/admin');
         break;
+        case 'sponsor':
+        navigate(`/sponsor/${user.id}/dashboard`);
+        break;
       default:
         navigate('/');
     }

@@ -1,22 +1,22 @@
 // src/server.ts
-// FINAL MERGED VERSION — COMPLETE CHILDGUARD BACKEND (You + Your Friend = Unstoppable Team)
+// FINAL MERGED VERSION — COMPLETE CHILDGUARD BACKEND
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 
-// ── Import centralized routes (contains ALL features from both teams) ────────
-import routes from './routes/index'; // ← This now includes EVERYTHING: volunteer, admin, parent, family, challans, etc.
-
+// ── Import centralized routes (all modules: volunteer, admin, parent, sponsor, etc.)
+import routes from './routes/index'; // ← This router includes all modules
+import sponsorRoutes from './routes/sponsorRoutes';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ── Middleware ───────────────────────────
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));                    // Support large file uploads (photos, documents)
+app.use(express.json({ limit: '10mb' }));                    // Support large file uploads (photos, docs)
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// ── Serve uploaded files (photos, documents, awareness images, etc.) ─────
+// ── Serve uploaded files (photos, documents, awareness images, etc.)
 const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
@@ -24,24 +24,23 @@ if (!fs.existsSync(uploadsDir)) {
 }
 app.use('/uploads', express.static(uploadsDir));
 
-// ── Mount ALL API routes under /api + legacy direct mounts ───────────────────
-// This gives maximum compatibility with both old and new frontend code
-app.use('/api', routes);        // ← NEW & CLEAN: All modern routes
-app.use('/', routes);           // ← LEGACY SUPPORT: For old direct calls like /volunteer/..., /case/...
+// ── Mount ALL API routes under /api + legacy direct mounts
+app.use('/api', routes);        // Modern API
+app.use('/', routes);           // Legacy support
 
-// ── Optional: Keep direct mounts for critical paths (100% backward compatibility) ──
+// Optional legacy direct mounts for backward compatibility
 app.use('/volunteer', routes);
 app.use('/case', routes);
 app.use('/visits', routes);
 app.use('/user', routes);
 app.use('/availability', routes);
-
-// ── 404 Handler — Helpful for debugging ─────────────────────────────────────
+app.use("/api/sponsor", sponsorRoutes); 
+// ── 404 Handler — Helpful for debugging
 app.use((req: express.Request, res: express.Response) => {
   res.status(404).json({
     success: false,
     message: 'Route not found',
-    tip: 'Make sure you are using correct path under /api or direct legacy paths',
+    tip: 'Use correct path under /api or legacy direct paths',
     availableEndpoints: [
       'POST   /api/auth/register',
       'POST   /api/auth/login',
@@ -58,7 +57,7 @@ app.use((req: express.Request, res: express.Response) => {
   });
 });
 
-// ── Start Server ───────────────────────────────────────────────────────────
+// ── Start Server ─────────────────────────
 app.listen(PORT, () => {
   console.log(`\nChildGuard Backend LIVE → http://localhost:${PORT}`);
   console.log(`Static uploads     → http://localhost:${PORT}/uploads`);
