@@ -1,4 +1,3 @@
-// src/components/NavBar.jsx
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Navbar.css'; 
@@ -7,23 +6,26 @@ function NavBar({ user, onLogout, openPanel }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Determine dynamic label for the first button
+  // Determine label: Show 'Dashboard' if on Home OR About page
   const getDynamicLabel = () => {
     if (!user) return null;
-    return location.pathname === '/' ? 'Dashboard' : 'Home';
+    if (location.pathname === '/' || location.pathname === '/about') {
+      return 'Dashboard';
+    }
+    return 'Home';
   };
 
   const handleDynamicClick = () => {
-    if (!user) return openPanel('login');
-
-    if (location.pathname === '/') {
-      // Navigate to the correct dashboard based on role
+    if (user && (location.pathname === '/' || location.pathname === '/about')) {
       switch (user.role) {
         case 'volunteer':
           navigate(`/volunteer/${user.id}/dashboard`);
           break;
         case 'admin':
           navigate('/admin');
+          break;
+        case 'sponsor':
+          navigate(`/sponsor/${user.id}/dashboard`);
           break;
         case 'parent':   
           navigate('/parent/dashboard');
@@ -36,6 +38,14 @@ function NavBar({ user, onLogout, openPanel }) {
     }
   };
 
+  const handleAuthClick = (type) => {
+    if (location.pathname === '/') {
+      openPanel(type);
+    } else {
+      navigate('/', { state: { openAuthPanel: type } });
+    }
+  };
+
   return (
     <>
       <nav className="navbar">
@@ -44,43 +54,46 @@ function NavBar({ user, onLogout, openPanel }) {
           ChildGuard
         </div>
 
-        {/* Navigation Links */}
         <div className="navbar-links">
+          <button className="nav-btn" onClick={() => navigate('/about')}>
+            About Us
+          </button>
+
           {user ? (
             <>
-              {/* Dynamic Home/Dashboard button */}
+              {/* Dashboard / Home */}
               <button className="nav-btn" onClick={handleDynamicClick}>
                 {getDynamicLabel()}
               </button>
 
-              {/* Profile button */}
-              <button className="nav-btn" onClick={() => navigate('/dashboard')}>
+              {/* Profile (centralized) */}
+              <button className="nav-btn" onClick={() => navigate('/profile')}>
                 Profile
               </button>
 
-              {/* Logout button */}
               <button className="nav-btn logout-btn" onClick={onLogout}>
                 Sign Out
               </button>
             </>
           ) : (
-            <>
-              {/* Login/Register/About buttons for guests */}
-              <button className="nav-btn" onClick={() => openPanel('login')}>
-                Login
+            location.pathname === '/about' ? (
+              <button className="nav-btn" onClick={() => navigate('/')}>
+                Home
               </button>
-              <button className="nav-btn" onClick={() => openPanel('register')}>
-                Register
-              </button>
-              <button className="nav-btn" onClick={() => navigate('/about')}>
-                About Us
-              </button>
-            </>
+            ) : (
+              <>
+                <button className="nav-btn" onClick={() => handleAuthClick('login')}>
+                  Login
+                </button>
+                <button className="nav-btn" onClick={() => handleAuthClick('register')}>
+                  Register
+                </button>
+              </>
+            )
           )}
         </div>
       </nav>
 
-      {/* Spacer to prevent content overlap */}
       <div className="navbar-spacer"></div>
     </>
   );
